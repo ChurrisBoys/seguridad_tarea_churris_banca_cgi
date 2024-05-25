@@ -1,11 +1,12 @@
 #include <iostream>
 #include <cstring>
 #include <mariadb/mysql.h>
+#include <nlohmann/json.hpp> // Retrieved from https://github.com/nlohmann/json
 
 using namespace std;
 
 int main() {
-    cout << "Content-type: text/plain\n\n";  // Set content type to plain text
+    cout << "Content-type: application/json\n\n";  // Set content type to plain text
 
     // Read POST data
     string input;
@@ -86,9 +87,17 @@ int main() {
 
     // Fetch and print results
     if (mysql_stmt_fetch(stmt) == 0) {
-        cout << "Username: " << username << "\n";
-        cout << "Balance: " << balance << "\n";
-        cout << "Currency: " << (currency == 1 ? "Churricoin" : "Euro") << "\n";
+        // cout << "Username: " << username << "\n";
+        // cout << "Balance: " << balance << "\n";
+        // cout << "Currency: " << (currency == 1 ? "Churricoin" : "Euro") << "\n";
+
+        // Converting response to json
+        nlohmann::json jsonDatabaseResult = {
+            {"Username", username},
+            {"Balance", balance},
+            {"Currency", (currency == 1 ? "Churricoin" : "Euro")}
+        };
+        cout << jsonDatabaseResult.dump() << endl;
     } else {
         cout << "Error: No data found" << endl;
     }
