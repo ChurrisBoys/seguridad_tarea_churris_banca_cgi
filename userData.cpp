@@ -2,6 +2,7 @@
 #include <cstring>
 #include <mariadb/mysql.h>
 #include <nlohmann/json.hpp> // Retrieved from https://github.com/nlohmann/json
+#include <regex>
 
 using namespace std;
 
@@ -22,7 +23,7 @@ MYSQL_STMT* makeSqlStatement(MYSQL* conn, char* query) {
 }
 
 int main() {
-    cout << "Content-type: application/json\n\n";  // Set content type to plain text
+    cout << "Content-type: application/json\n\n";  
 
     // Getting query variable to determine the action
     char* urlVariablesChar = getenv("QUERY_STRING");
@@ -113,7 +114,7 @@ int main() {
 
         // Execute the query
         if (mysql_stmt_execute(enoughMoneyStmt)) {
-            cerr << "Error: Statement execute failed: " << mysql_stmt_error(enoughMoneyStmt) << endl;
+            cerr << "Error: Statement execute failed " << endl;
             return 1;
         }
 
@@ -163,13 +164,13 @@ int main() {
         string sqlReceiverBaseMoney = "SELECT b.balance FROM Balance b WHERE b.username='" + intendedReceiver + "'";
         float receiversMoney;
         if (mysql_query(conn, sqlReceiverBaseMoney.c_str()) == 1) {
-            cout << "Error: Balance substraction failed: " << mysql_error(conn) << endl;
+            cout << "Error: Balance substraction failed " << endl;
             return 1;
         }
         // Store the result set
         MYSQL_RES *res = mysql_store_result(conn);
         if (res == NULL) {
-            cout << "Error: Store result failed: " << mysql_error(conn) << endl;
+            cout << "Error: Store result failed " << endl;
             return 1;
         }
         MYSQL_ROW row;
@@ -180,11 +181,11 @@ int main() {
         string sqlUpdateSenderQuery = "UPDATE Balance SET balance=" + to_string(sendersMoney-intendedAmountToTransfer) + " WHERE username=" + "'" + intendedSender + "'";
         string sqlUpdateReceiverQuery = "UPDATE Balance SET balance=" + to_string(receiversMoney+intendedAmountToTransfer) + " WHERE username=" + "'" + intendedReceiver + "'";
         if (mysql_query(conn, sqlUpdateSenderQuery.c_str()) == 1) {
-            cout << "Error: Balance substraction failed: " << mysql_error(conn) << endl;
+            cout << "Error: Balance substraction failed " << endl;
             return 1;
         }
         if (mysql_query(conn, sqlUpdateReceiverQuery.c_str()) == 1) {
-            cout << "Error: Balance addition failed: " << mysql_error(conn) << endl;
+            cout << "Error: Balance addition failed "<< endl;
             return 1;
         }
         //======
@@ -198,7 +199,7 @@ int main() {
         char* username = strtok(bodyChar, "=");
         username = strtok(nullptr, "=");
         if(username == nullptr) {
-            cout << "Error: username not provided" << endl << "Received input: " << input << endl;
+            cout << "Error: username not provided" << endl;
             return 1;
         }
         string usernameString(username);
@@ -240,7 +241,7 @@ int main() {
 
         // Execute the query
         if (mysql_stmt_execute(getAllUserTransactionsStmt)) {
-            cerr << "Error: Statement execute failed: " << mysql_stmt_error(getAllUserTransactionsStmt) << endl;
+            cerr << "Error: Statement execute failed " << endl;
             return 1;
         }
 
@@ -256,8 +257,13 @@ int main() {
     // Extract username from input
     size_t pos = input.find("username=");
     string username;
+    std::regex userpattern("^[a-zA-Z]{1,80}(\.[a-zA-Z]{1,80})?$"); 
     if (pos != string::npos) {
         username = input.substr(pos + 9);
+	if(!regex_match(username, userpattern)){
+		cerr << " Invalid data" << endl;
+		return 1;
+	}
     } else {
         cout << "Error: username not provided" << endl;
         return 1;
@@ -268,12 +274,12 @@ int main() {
     char query[] = "SELECT balance, currency FROM Balance WHERE username=?";
     stmt = mysql_stmt_init(conn);
     if (!stmt) {
-        cerr << "Error: Statement init failed: " << mysql_error(conn) << endl;
+        cerr << "Error: Statement init failed " << endl;
         return 1;
     }
 
     if (mysql_stmt_prepare(stmt, query, strlen(query))) {
-        cerr << "Error: Statement prepare failed: " << mysql_stmt_error(stmt) << endl;
+        cerr << "Error: Statement prepare failed " << endl;
         return 1;
     }
 
@@ -298,7 +304,7 @@ int main() {
 
     // Execute the query
     if (mysql_stmt_execute(stmt)) {
-        cerr << "Error: Statement execute failed: " << mysql_stmt_error(stmt) << endl;
+        cerr << "Error: Statement execute failed " << endl;
         return 1;
     }
 
