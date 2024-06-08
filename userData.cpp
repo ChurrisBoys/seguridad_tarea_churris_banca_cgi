@@ -33,8 +33,12 @@ int main() {
         urlAction = strtok(urlVariablesChar, "a=");
 
     // Read POST data
-    string input;
-    getline(cin, input); // Read input from stdin
+    char*  temp = new char[0xFFFF];
+    // getline(cin, input);
+    temp[0xFFFE] = 0;
+    std::cin.getline(temp, 0xFFFE);
+    string input(temp);
+    delete[] temp;
 
     // Initialize Connection
     MYSQL *conn;
@@ -57,6 +61,8 @@ int main() {
         mysql_close(conn);
         return 1;
     }
+
+    std::regex userpattern("^[a-zA-Z]{1,80}(\.[a-zA-Z]{1,80})?$");
 
     // If the action(a) equals CT(CreateTransaction) then create a transaction
     if(urlAction == "CT") {
@@ -257,7 +263,6 @@ int main() {
     // Extract username from input
     size_t pos = input.find("username=");
     string username;
-    std::regex userpattern("^[a-zA-Z]{1,80}(\.[a-zA-Z]{1,80})?$"); 
     if (pos != string::npos) {
         username = input.substr(pos + 9);
 	if(!regex_match(username, userpattern)){
