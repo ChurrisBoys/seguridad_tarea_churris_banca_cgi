@@ -10,12 +10,12 @@ MYSQL_STMT* makeSqlStatement(MYSQL* conn, char* query) {
     MYSQL_STMT* stmt;
     stmt = mysql_stmt_init(conn);
     if (!stmt) {
-        cerr << "Error: Statement init failed: " << mysql_error(conn) << endl;
+        cerr << "Error: Statement init failed " << endl;
         exit(1);
     }
 
     if (mysql_stmt_prepare(stmt, query, strlen(query))) {
-        cerr << "Error: Statement prepare failed: " << mysql_stmt_error(stmt) << endl;
+        cerr << "Error: Statement prepare failed" << endl;
         exit(1);
     }
 
@@ -57,7 +57,7 @@ int main() {
         NULL,                 // Path to socket file
         0                     // Additional options
     )) {
-        cerr << "Error connecting to Server: " << mysql_error(conn) << endl;
+        cerr << "Error connecting to Server " << endl;
         mysql_close(conn);
         return 1;
     }
@@ -93,11 +93,24 @@ int main() {
                 intendedSender = string(bodyTokensChars);
             else if(i == 1)
                 intendedReceiver = string(bodyTokensChars);
-            else if(i == 2)
+            else if(i == 2) {
+                if (!regex_match(string(bodyTokensChars), "^\d{1,6}(\.\d{1,3})?$") {
+			cerr << "Invalid data" << endl;
+			return 1;
+		}
                 intendedAmountToTransfer = atof(bodyTokensChars);
+                if (intendedAmountToTransfer <= 0) {
+			cerr << "Invalid data" << endl;
+			return 1;
+		}
+	    }
             ++i;
             bodyTokensChars = strtok(nullptr, delimiter);
         }
+        if (!regex_match(intendedSender, userpattern) || !regex_match(intendedReceiver, userpattern)) {
+		cerr << "Invalid data" << endl;
+		return 1;
+	}
         mysql_stmt_bind_param(makeTransactionStmt, param);
 
         //===========================  Check if the sender has enough money to make the transfer
