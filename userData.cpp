@@ -51,7 +51,7 @@ int main() {
         conn,                 // Connection
         "127.0.0.1",          // Host
         "churris",            // User account
-        "password",           // User password
+        "5it2ZC6cfnRme3KIxghmFWnbmBUM8Fvw0VCvCrWgmzoG46rw6q",           // User password
         "churrisbanca_bancaria", // Default database
         3306,                 // Port number
         NULL,                 // Path to socket file
