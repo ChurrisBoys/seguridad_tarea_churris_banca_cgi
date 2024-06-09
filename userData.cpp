@@ -63,7 +63,7 @@ int main() {
     }
 
     std::regex userpattern("^[a-zA-Z]{1,80}(\.[a-zA-Z]{1,80})?$");
-    std::regex amountpattern("^\d{1,6}(\.\d{1,3})?$");
+    std::regex amountpattern("^[0123456789]{1,6}(\.[0123456789]{1,3})?$");
 
     // If the action(a) equals CT(CreateTransaction) then create a transaction
     if(urlAction == "CT") {
@@ -88,15 +88,15 @@ int main() {
             else if(i == 1)
                 intendedReceiver = string(bodyTokensChars);
             else if(i == 2) {
-                // if (!regex_match(string(bodyTokensChars), amountpattern)){
-		//	cerr << "Invalid data" << endl;
-		//	return 1;
-		// }
+                if (!regex_match(string(bodyTokensChars), amountpattern)){
+			cerr << "Invalid data" << endl;
+			return 1;
+		}
                 intendedAmountToTransfer = atof(bodyTokensChars);
-                // if (intendedAmountToTransfer <= 0) {
-		//	cerr << "Invalid data" << endl;
-		//	return 1;
-		//}
+                if (intendedAmountToTransfer <= 0) {
+			cerr << "Invalid data" << endl;
+			return 1;
+		}
 	    }
             ++i;
             bodyTokensChars = strtok(nullptr, delimiter);
@@ -126,7 +126,7 @@ int main() {
 
        // Execute the stored procedure
         if (mysql_stmt_execute(makeTransactionStmt)) {
-            cout << "Error: Statement execute failed" << endl;
+            cerr << "Error: Statement execute failed" << endl;
             return 1;
         }
 
