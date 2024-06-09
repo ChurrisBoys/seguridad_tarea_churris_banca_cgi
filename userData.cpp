@@ -65,9 +65,6 @@ int main() {
     std::regex userpattern("^[a-zA-Z]{1,80}(\.[a-zA-Z]{1,80})?$");
     std::regex amountpattern("^\d{1,6}(\.\d{1,3})?$");
 
-    // TODO (borrar):
-    cout << "urlaction " << urlAction << endl;
-
     // If the action(a) equals CT(CreateTransaction) then create a transaction
     if(urlAction == "CT") {
         // GET and Validate data
@@ -79,23 +76,13 @@ int main() {
         string intendedSender;
         string intendedReceiver;
         float intendedAmountToTransfer;
-        // float sendersMoney;
 
         // Prepare the query
         auto makeTransactionStmt = makeSqlStatement(conn, "CALL MakeTransaction(?, ?, ?)");
-        // MYSQL_BIND param[3];
-        // memset(param, 0, sizeof(param));
         int i = 0;
 
         // Getting all the data in the body of the HTTP request
         while (bodyTokensChars != nullptr) {
-            // Bind parameters
-            // param[i].buffer_type = MYSQL_TYPE_STRING;
-            // param[i].buffer = bodyTokensChars;
-            // param[i].buffer_length = strlen(bodyTokensChars);
-
-            // TODO (borrar)
-            cout << "bodytoken " << bodyTokensChars << endl;
             if(i == 0)
                 intendedSender = string(bodyTokensChars);
             else if(i == 1)
@@ -119,9 +106,6 @@ int main() {
 		return 1;
 	}
 
-        // TODO(borrar)
-        cout << "Ya tengo los parametros" << endl;
-
         // Bind parameters
         MYSQL_BIND param[3];
         memset(param, 0, sizeof(param));
@@ -138,13 +122,7 @@ int main() {
         param[2].buffer = (char*)&intendedAmountToTransfer;
         param[2].buffer_length = sizeof(intendedAmountToTransfer);
 
-        // TODO (borrar)
-        cout << "ya puse las cosas" << endl;
-
         mysql_stmt_bind_param(makeTransactionStmt, param);
-
-         // TODO (borrar)
-        cout << "Ya bind "<< endl;
 
        // Execute the stored procedure
         if (mysql_stmt_execute(makeTransactionStmt)) {
@@ -156,8 +134,6 @@ int main() {
 
         mysql_stmt_close(makeTransactionStmt);
 
-        // Clean up
-        // cout << "Transaction succesful" << endl;
         return 1;
     }
     else if(urlAction == "S") {
