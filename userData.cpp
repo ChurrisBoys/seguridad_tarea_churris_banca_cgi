@@ -49,10 +49,10 @@ int main() {
 
     if (!mysql_real_connect(
         conn,                 // Connection
-        "127.0.0.1",          // Host
-        "churris",            // User account
-        "5it2ZC6cfnRme3KIxghmFWnbmBUM8Fvw0VCvCrWgmzoG46rw6q",           // User password
-        "churrisbanca_bancaria", // Default database
+        getenv("DB_HOST"),          // Ho   st
+        getenv("DB_USER"),            // User account
+        getenv("DB_PASSWORD"),           // User password
+        getenv("DB_NAME"), // Default database
         3306,                 // Port number
         NULL,                 // Path to socket file
         0                     // Additional options
